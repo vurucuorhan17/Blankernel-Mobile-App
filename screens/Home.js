@@ -7,15 +7,16 @@ class Home extends Component
     constructor(props)
     {
         super(props);
+        this.onEndReachedCalledDuringMomentum = false;
         this.state = {
             page: 1,
             posts: [],
             isLoading: false,
-            isRefreshLoading: false
+            isRefreshLoading: false,
+            hasMoreToLoad: true
         }
     }
     
-
     componentDidMount()
     {  
         this.setState({isLoading: true},this.getData);
@@ -26,6 +27,10 @@ class Home extends Component
         await fetch(`http://blankernel.com/wp-json/wp/v2/posts?page=${this.state.page}&_embed`)
         .then(response => response.json())
         .then((data) => {
+            if(data.length < 10)
+            {
+                this.setState({ hasMoreToLoad: false });
+            }
             this.setState({
                 posts: this.state.posts.concat(data),
                 isLoading: false
@@ -51,10 +56,17 @@ class Home extends Component
 
     handleLoadMore = () =>
     {
-        this.setState({
-            page: this.state.page + 1,
-            isLoading: true
-        },this.getData)
+        if(this.state.hasMoreToLoad)
+        {
+            this.setState({
+                page: this.state.page + 1,
+                isLoading: true
+            },this.getData)
+        }
+        else
+        {
+            return null;  
+        }
     }
 
     renderFooter = () => 
@@ -69,35 +81,47 @@ class Home extends Component
         );
     }
 
-    renderItem({item})
+    renderItem = ({item}) =>
     {
-        
-        return (
-            <ArticleOnHome
-                    id={item.id}
-                    title={item.title.rendered}
-                    author={item._embedded.author[0].name}
-                    image={item._embedded['wp:featuredmedia'][0].source_url}
-                    excerpt={item.excerpt.rendered}
-            />
-        );
+        {
+            try 
+            {
+                return (
+                    <ArticleOnHome
+                        id={item.id}
+                        title={item.title.rendered}
+                        author={item._embedded.author[0].name}
+                        image={item._embedded['wp:featuredmedia'][0].source_url}
+                        excerpt={item.excerpt.rendered}
+                        navigation={this.props.navigation}
+                        link={item.link}
+                    />
+                );
+            }
+            catch(e)
+            {
+                return null;
+            }
+        }
         
     }
 
     render()
     {
         return (
+            <>
             <View style={styles.container}>
                 <FlatList
                     data={this.state.posts}
                     renderItem={this.renderItem}
                     keyExtractor={(item,index) => index.toString()}
-                    onEndReached={this.handleLoadMore}
+                    onEndReached={this.state.hasMoreToLoad ? this.handleLoadMore : null}
                     ListFooterComponent={this.renderFooter}
                     refreshing={this.state.isRefreshLoading}
                     onRefresh={this.getDataFromRefresh}
                 />
             </View>
+            </>
         ); 
     }
 

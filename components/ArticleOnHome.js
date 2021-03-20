@@ -1,41 +1,50 @@
 import React from "react";
-import { View,StyleSheet,Image,Text } from "react-native";
+import { View,StyleSheet,Image } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import HTML from "react-native-render-html";
+import { Container,Content,Card,CardItem,Left,Body,Text } from "native-base";
 
 const ArticleOnHome = (props) =>
 {
 
-    const { id,title, author, image, excerpt } = props;
+    const { id,title, author, image, excerpt, navigation, link } = props;
 
     return (
-        <TouchableOpacity>
-            <View style={styles.cardBorder}>
-                <HTML containerStyle={{marginLeft: 15,marginTop: 20,}} source={{ html: title }}/>
-                <Text style={styles.authorText}>Yazar: {author}</Text>
-                <Image style={styles.cardImage} source={{ uri: image, width: 300 , height: 150 }}></Image>
-                <Text style={styles.excerpt}>{excerpt.substring(3,100)}...</Text>
-            </View>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate("Post",{
+            link,
+            title: title.replace("&#8211;","-").replace("&#8217;","'").replace("&#8211;","-")
+        })}>
+            <Content style={styles.cardBorder}>
+                <Card> 
+                    <CardItem>
+                        <Left>
+                            <Body>
+                                <Text>{title.replace("&#8211;","-").replace("&#8217;","'").replace("&#8211;","-")}</Text>
+        
+                                <Text note>{author}</Text>
+                            </Body>
+                        </Left>
+                    </CardItem>
+                    <CardItem>
+                        <Body>
+                            <Image source={{uri: image}} style={{width: 300 , height: 170}}/>
+                            <HTML tagsStyles={{ p: { color:"purple",width: 310, height: 55, } }} containerStyle={{ marginLeft: 5, marginTop: 5 }} source={{ html: excerpt }}/> 
+                        </Body>
+                    </CardItem>
+                </Card>
+            </Content>
         </TouchableOpacity>
-
+          
     );
 
 }
 
 const styles = StyleSheet.create({
     cardBorder: {
-        flex: 1,
-        flexDirection: "column",
-        borderWidth: 0.5,
-        borderStyle: "solid",
-        borderColor: "grey",
-        borderRadius: 3,
+        marginTop: 5,
         marginBottom: 10,
-        width: 330,
-        height: 310,
-        alignItems: "baseline",
-        alignSelf: "flex-start",
-        marginLeft: 6,
+        marginLeft: -10,
+        marginRight: 10
     },
     title:{
         fontSize: 19,
@@ -52,9 +61,9 @@ const styles = StyleSheet.create({
         marginTop: 8
     },
     authorText: {
-        marginLeft: 16,
+        marginLeft: 10,
         marginTop: 5,
-        fontStyle: "italic"
+        fontFamily:"Roboto_medium"
     }
 });
 
