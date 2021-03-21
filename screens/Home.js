@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { ScrollView, Button, Text, StyleSheet, View, FlatList} from "react-native";
+import { ScrollView, Button, Text, StyleSheet, View, FlatList, TouchableOpacity} from "react-native";
 import ArticleOnHome from "../components/ArticleOnHome";
+import Icon from "react-native-vector-icons/Ionicons";
 
 class Home extends Component
 {
@@ -15,11 +16,16 @@ class Home extends Component
             isRefreshLoading: false,
             hasMoreToLoad: true
         }
+        this.listViewRef;
     }
     
     componentDidMount()
-    {  
+    {
+        const ac = new AbortController(); 
+
         this.setState({isLoading: true},this.getData);
+
+        return () => ac.abort();
     }
 
     getData = async () => 
@@ -106,6 +112,11 @@ class Home extends Component
         
     }
 
+    scrollTopHandler = () => 
+    {
+        this.listViewRef.scrollToOffset({ offset: 0, animated: true });
+    }
+
     render()
     {
         return (
@@ -119,7 +130,15 @@ class Home extends Component
                     ListFooterComponent={this.renderFooter}
                     refreshing={this.state.isRefreshLoading}
                     onRefresh={this.getDataFromRefresh}
+                    ref={(ref) => {
+                        this.listViewRef = ref;
+                    }}
                 />
+                {this.state.isLoading ? null : (
+                    <TouchableOpacity activeOpacity={0.7} style={styles.scrollTopButton} onPress={this.scrollTopHandler}>
+                        <Icon style={styles.arrowUp} name="arrow-up-outline" size={30}/>
+                    </TouchableOpacity>
+                )}
             </View>
             </>
         ); 
@@ -159,6 +178,23 @@ const styles = StyleSheet.create({
         marginTop: 10,
         alignItems: "center",
         marginBottom: 5
+    },
+    scrollTopButton: {
+        right: 30,
+        bottom: 35,
+        position: "absolute",
+        width: 60,
+        height: 40,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "purple",
+        borderWidth: 0.5,
+        borderRadius: 70,
+        borderColor: "purple"
+
+    },
+    arrowUp:{
+        color: "white"
     }
 });
 

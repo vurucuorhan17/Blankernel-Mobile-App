@@ -6,6 +6,7 @@ const Authors = ({ navigation }) => {
     const [authors, setAuthors] = useState([]);
 
     useEffect(() => {
+        const ac = new AbortController();
         async function getAuthorsData() {
             await fetch(`http://blankernel.com/wp-json/wp/v2/users`)
                 .then(response => response.json())
@@ -15,6 +16,8 @@ const Authors = ({ navigation }) => {
         }
 
         getAuthorsData();
+
+        return () => ac.abort();
     });
 
     const getImageForUser = (id) => 

@@ -16,6 +16,8 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.orhanvurucu.blankernel",
+      "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "androidNavigationBar": {
@@ -23,6 +25,8 @@
       "barStyle": "dark-content"
     },
     "android": {
+      "package": "com.orhanvurucu.blankernel",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
